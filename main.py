@@ -109,8 +109,7 @@ if __name__ == "__main__":
                  [sg.Text('', size=(8, 2), font=('Helvetica', 20),
                           justification='center', key='text')],
                  [sg.Text('Timer adjustment')],
-                 [sg.Text('Current timeout: 1 Minute', key='current-timeout')],
-                 # [sg.Slider(default_value=1, orientation='horizontal', range=(0, 60), tick_interval=10, size=(50, 30))],
+                 [sg.Text(key='current-timeout', text='Current timeout: 1 Minute')],
                  [sg.Button(button_text='-', key='-DEC-TIMER-', button_color=('white', '#00F'), size=(8, 2)),
                   sg.Button(button_text='+', key='-INC-TIMER-', button_color=('white', '#FFA500'), size=(8, 2))],
                  [sg.Button(button_text='Pause', key='-RUN-PAUSE-', button_color=('white', '#001480'), size=(8, 2)),
@@ -143,21 +142,26 @@ if __name__ == "__main__":
         elif event == '-DEC-TIMER-':
             if NEXTIMGTIMEOUT > 6000:
                 NEXTIMGTIMEOUT -= 6000
-            if NEXTIMGTIMEOUT // 6000 > 1:
-                s = 's'
-            else:
-                s = ''
-            new_text = f"Current timeout: {NEXTIMGTIMEOUT // 6000} Minute{s}"
-            window['current-timeout'].update(new_text)
+                if NEXTIMGTIMEOUT // 6000 > 1:
+                    s = 's'
+                else:
+                    s = ''
+                # TODO fix current timeout display
+                new_text = f"Current timeout: {NEXTIMGTIMEOUT // 6000} Minute{s}"
+                print(new_text)
+                window['current-timeout'].update(value=new_text)
         elif event == '-INC-TIMER-':
             if NEXTIMGTIMEOUT < 6000 * 60:
                 NEXTIMGTIMEOUT += 6000
-            if NEXTIMGTIMEOUT // 6000 > 1:
-                s = 's'
-            else:
-                s = ''
-            new_text = f"Current timeout: {NEXTIMGTIMEOUT // 6000} Minute{s}"
-            window['current-timeout'].update(new_text)
+                if NEXTIMGTIMEOUT // 6000 > 1:
+                    s = 's'
+                else:
+                    s = ''
+
+                # TODO fix current timeout display
+                new_text = f"Current timeout: {NEXTIMGTIMEOUT // 6000} Minute{s}"
+                print(new_text)
+                window['current-timeout'].update(value=new_text)
         elif event == '-RESET-':
             paused_time = start_time = time_as_int()
             current_time = 0
