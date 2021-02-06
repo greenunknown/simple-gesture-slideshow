@@ -65,7 +65,7 @@ if __name__ == "__main__":
     start_time = time_as_int()
 
     # Get the folder containing the images from the user
-    folder = sg.popup_get_folder('Image folder to open', default_path='')
+    folder = sg.popup_get_folder(background_color='#272927', message='Image folder to open', default_path='')
     if not folder:
         sg.popup_cancel('Cancelling')
         raise SystemExit()
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     # initialize to the first file in the list
     filename = os.path.join(folder, fnames[0])  # name of first file in list
     image_elem = sg.Image(data=get_img_data(filename, first=True))
-    filename_display_elem = sg.Text(filename, size=(80, 3))
+    filename_display_elem = sg.Text(filename, size=(50, 3))#(80, 3))
     file_num_display_elem = sg.Text('File 1 of {}'.format(num_files), size=(15, 1))
 
     # define layout, show and read the form
@@ -103,26 +103,32 @@ if __name__ == "__main__":
     col = [[image_elem]]
 
     col_files = [[filename_display_elem],
-                [sg.Listbox(values=fnames, change_submits=True, size=(60, 30), key='listbox')],
+                 [sg.Listbox(values=fnames, change_submits=True, size=(50, 30), key='listbox')],
                  [sg.Button('Prev', size=(8, 2)), sg.Button('Next', size=(8, 2)), file_num_display_elem],
                  [sg.Text('')],
                  [sg.Text('', size=(8, 2), font=('Helvetica', 20),
                           justification='center', key='text')],
-                 [sg.Button('Pause', key='-RUN-PAUSE-', button_color=('white', '#001480')),
-                  sg.Button('Reset', button_color=('white', '#007339'), key='-RESET-'),
-                  sg.Exit(button_color=('white', 'firebrick4'), key='Exit')]
+                 [sg.Text('Timer adjustment')],
+                 [sg.Text('Current timeout: 1 Minute', key='current-timeout')],
+                 # [sg.Slider(default_value=1, orientation='horizontal', range=(0, 60), tick_interval=10, size=(50, 30))],
+                 [sg.Button(button_text='-', key='-DEC-TIMER-', button_color=('white', '#00F'), size=(8, 2)),
+                  sg.Button(button_text='+', key='-INC-TIMER-', button_color=('white', '#FFA500'), size=(8, 2))],
+                 [sg.Button(button_text='Pause', key='-RUN-PAUSE-', button_color=('white', '#001480'), size=(8, 2)),
+                  sg.Button(button_text='Reset', key='-RESET-', button_color=('white', '#007339'), size=(8, 2)),
+                  sg.Exit(button_text='Exit', key='Exit', button_color=('white', 'firebrick4'), size=(8, 2))]
                  ]
 
     layout = [[sg.Column(vertical_alignment='top', layout=col_files), sg.Column(vertical_alignment='top', layout=col)]]
 
     window = sg.Window('Image Browser', layout, return_keyboard_events=True,
-                       location=(0, 0), size=(1920, 1080), resizable=True, use_default_focus=False)
+                       location=(0, 0), size=(1920, 1080), background_color='#272927',
+                       resizable=True, use_default_focus=False)
 
     # loop reading the user input and displaying image, filename
-    NEXTIMGTIMEOUT = 1000
+    NEXTIMGTIMEOUT = 6000 #1000
     i = 0
     while True:
-        print(sg.Window.get_screen_size())
+        # print(sg.Window.get_screen_size())
         # print(paused)
         if not paused:
             event, values = window.read(timeout=10)
@@ -134,6 +140,24 @@ if __name__ == "__main__":
 
         if event in (sg.WIN_CLOSED, 'Exit'):
             break
+        elif event == '-DEC-TIMER-':
+            if NEXTIMGTIMEOUT > 6000:
+                NEXTIMGTIMEOUT -= 6000
+            if NEXTIMGTIMEOUT // 6000 > 1:
+                s = 's'
+            else:
+                s = ''
+            new_text = f"Current timeout: {NEXTIMGTIMEOUT // 6000} Minute{s}"
+            window['current-timeout'].update(new_text)
+        elif event == '-INC-TIMER-':
+            if NEXTIMGTIMEOUT < 6000 * 60:
+                NEXTIMGTIMEOUT += 6000
+            if NEXTIMGTIMEOUT // 6000 > 1:
+                s = 's'
+            else:
+                s = ''
+            new_text = f"Current timeout: {NEXTIMGTIMEOUT // 6000} Minute{s}"
+            window['current-timeout'].update(new_text)
         elif event == '-RESET-':
             paused_time = start_time = time_as_int()
             current_time = 0
