@@ -10,6 +10,11 @@ import io
 import random
 import time
 
+# TODO Feat: List thumbnails instead of file names
+# TODO Feat: Recursive file directory access
+# TODO Feat: Set increments via a input box
+# TODO Bug: Fix timer element when selecting new images should reset rather than continue?
+
 
 def time_as_int():
     return int(round(time.time() * 100))
@@ -102,14 +107,16 @@ if __name__ == "__main__":
     #        [image_elem]]
     col = [[image_elem]]
 
+    # TODO add controls for basic image maniuplation like flipping and grayscale
     col_files = [[filename_display_elem],
-                 [sg.Listbox(values=fnames, change_submits=True, size=(50, 30), key='listbox')],
+                 [sg.Listbox(values=fnames, change_submits=True, size=(50, 30), key='listbox')], # TODO display thumbnails instead of filenames
                  [sg.Button('Prev', size=(8, 2)), sg.Button('Next', size=(8, 2)), file_num_display_elem],
                  [sg.Text('')],
                  [sg.Text('', size=(8, 2), font=('Helvetica', 20),
                           justification='center', key='text')],
                  [sg.Text('Timer adjustment')],
                  [sg.Text(key='current-timeout', text='Current timeout: 1 Minute')],
+                 [sg.Input(key='-TIMER-VALUE-', default_text=1)],
                  [sg.Button(button_text='-', key='-DEC-TIMER-', button_color=('white', '#00F'), size=(8, 2)),
                   sg.Button(button_text='+', key='-INC-TIMER-', button_color=('white', '#FFA500'), size=(8, 2))],
                  [sg.Button(button_text='Pause', key='-RUN-PAUSE-', button_color=('white', '#001480'), size=(8, 2)),
@@ -132,6 +139,7 @@ if __name__ == "__main__":
         if not paused:
             event, values = window.read(timeout=10)
             current_time = time_as_int() - start_time
+            print(f'values["-TIMER-VALUE-"]: {values["-TIMER-VALUE-"]}')
         else:
             event, values = window.read()
         # print(f"Event: {event}, Values: {values}")
